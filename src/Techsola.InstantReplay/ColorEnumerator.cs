@@ -1,6 +1,6 @@
 namespace Techsola.InstantReplay
 {
-    internal ref struct ColorEnumerator
+    internal unsafe ref struct ColorEnumerator
     {
         private unsafe byte* next;
         private unsafe byte* lineEnd;
@@ -17,13 +17,16 @@ namespace Techsola.InstantReplay
             imageEnd = start + (height * stride) - strideSkip;
         }
 
-        public uint Current
+        /// <summary>
+        /// Returns a pointer to the 'next' 3-byte RGB structure.
+        /// </summary>
+        public RGB* Current
         {
             get
             {
                 unsafe
                 {
-                    return *(uint*)next;
+                    return (RGB*)(next);
                 }
             }
         }

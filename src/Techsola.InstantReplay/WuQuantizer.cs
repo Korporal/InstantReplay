@@ -43,7 +43,7 @@ namespace Techsola.InstantReplay
             OutputIndexedPixels(sourceImage, cubes, indexedImageBuffer);
         }
 
-        private void OutputIndexedPixels(ColorEnumerable sourceImage, Box[] cubes, byte[] indexedImageBuffer)
+        private unsafe void OutputIndexedPixels(ColorEnumerable sourceImage, Box[] cubes, byte[] indexedImageBuffer)
         {
             for (var paletteIndex = 0; paletteIndex < cubes.Length; paletteIndex++)
             {
@@ -59,9 +59,9 @@ namespace Techsola.InstantReplay
             foreach (var pixel in sourceImage)
             {
                 indexedImageBuffer[i] = tag[
-                    (((pixel >> 16) & 0xFF) >> ChannelIndexShift) + 1,
-                    (((pixel >> 8) & 0xFF) >> ChannelIndexShift) + 1,
-                    ((pixel & 0xFF) >> ChannelIndexShift) + 1];
+                    ((pixel->R & 0xFF) >> ChannelIndexShift) + 1,
+                    ((pixel->G & 0xFF) >> ChannelIndexShift) + 1,
+                    ((pixel->B & 0xFF) >> ChannelIndexShift) + 1];
                 i++;
             }
         }
@@ -129,15 +129,15 @@ namespace Techsola.InstantReplay
             return cubes.ToArray();
         }
 
-        private void InitializeAs3DHistogram(ColorEnumerable sourceImage)
+        private unsafe void InitializeAs3DHistogram(ColorEnumerable sourceImage)
         {
             Array.Clear(moments, 0, moments.Length);
 
             foreach (var pixel in sourceImage)
             {
-                var channel1 = (pixel >> 16) & 0xFF;
-                var channel2 = (pixel >> 8) & 0xFF;
-                var channel3 = pixel & 0xFF;
+                var channel1 = pixel->R & 0xFF;
+                var channel2 = pixel->G & 0xFF;
+                var channel3 = pixel->B & 0xFF;
 
                 ref var latticePoint = ref moments[
                     (channel1 >> ChannelIndexShift) + 1,
